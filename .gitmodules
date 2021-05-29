@@ -1,6 +1,0 @@
-[submodule "sub/coq"]
-	path = sub/coq
-	url = https://github.com/coq/coq.git
-[submodule "sub/coq-tools"]
-	path = sub/coq-tools
-	url = https://github.com/JasonGross/coq-tools
