@@ -92,7 +92,8 @@ ifeq ($(VERBOSE),yes)
 OTHERFLAGS += -verbose
 endif
 ENHANCEDDOCTARGET = enhanced-html
-ENHANCEDDOCSOURCE = util/enhanced-doc
+ENHANCEDDOCSOURCE = ${coqdoc_overlay}/share/javascript/coqdoc-overlay
+ENHANCEDDOCHEADER = misc/html/header.html
 LATEXDIR = latex
 COQDOCLATEXOPTIONS := -latex -utf8 --body-only
 
@@ -247,7 +248,7 @@ doc: $(GLOBFILES) $(VFILES)
 	$(SHOW)COQDOC
 	$(HIDE)$(COQDOC)							\
 	    -toc $(COQDOCFLAGS) -html $(COQDOCLIBS) -d $(ENHANCEDDOCTARGET)	\
-	    --with-header $(ENHANCEDDOCSOURCE)/header.html			\
+	    --with-header $(ENHANCEDDOCHEADER)					\
 	    $(VFILES)
 	sed -i'.bk' -f $(ENHANCEDDOCSOURCE)/proofs-toggle.sed $(ENHANCEDDOCTARGET)/*html
 
