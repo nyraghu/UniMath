@@ -1,5 +1,0 @@
-
-\bibliographystyle{hamsplain}
-\bibliography{references}
-
-\end{document}
