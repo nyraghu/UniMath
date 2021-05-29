@@ -1,6 +1,3 @@
-# -*- makefile-gmake -*-
-UMAKEFILES += Makefile
-############################################
 # The packages, listed in order by dependency:
 PACKAGES += Foundations
 PACKAGES += MoreFoundations
@@ -166,7 +163,7 @@ admitted:
 axiom:
 	grep --color=auto "Axiom " $(VFILES)
 describe:; git describe --dirty --long --always --abbrev=40 --all
-.coq_makefile_input: $(PACKAGE_FILES) $(UMAKEFILES)
+.coq_makefile_input: $(PACKAGE_FILES) Makefile
 	@echo --- making $@ ; ( \
 	echo '# -*- makefile-gmake -*-' ;\
 	echo ;\
