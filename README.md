@@ -1,81 +1,64 @@
-Univalent Mathematics
-=====================
+# Fork of UniMath
 
-This [Coq](https://coq.inria.fr/) library aims to formalize a substantial body of mathematics using the
-[univalent point of view](https://en.wikipedia.org/wiki/Univalent_foundations).
+## Introduction
 
-Installation
-------------
+The [UniMath][1] project is an effort to formalise a large body of
+mathematics over the [univalent foundations][2].  At present the
+formalisation is in the framework of the [Coq][3] proof assistant.
 
-See
-[INSTALL.md](https://github.com/UniMath/UniMath/blob/master/INSTALL.md).
+I have created this fork of the UniMath project to experiment with the
+formalisation and learn from it.  The fork has no sanction from the
+UniMath project.
 
-Usage
------
+## Disclaimer
 
-See [USAGE.md](./USAGE.md)
+I am not an expert on the subject, and, as I have mentioned above, this
+fork is for my personal education.  Please visit the [UniMath project
+site][1] for official information and code.
 
-Contents
---------
+## Prerequisites
 
-The [UniMath subdirectory](UniMath/) contains various packages of formalized
-mathematics. For more information, see the [UniMath Table of Contents](UniMath/CONTENTS.md).
+I am assuming that the reader is
 
-Some scientific articles describing the contents of the UniMath library are listed in the 
-[wiki](https://github.com/UniMath/UniMath/wiki/Documentation:-Articles-describing-UniMath).
+* familiar with the basics of Coq,
+* working on a Unix-like operating system (Linux, macOS, etc.), and
+* knows how to run simple git commands.
 
-Contributing to UniMath
------------------------
+## Setup
 
-To contribute to UniMath, submit a pull request.  Your code will be subject to the 
-copyright and license agreement in [LICENSE.md](LICENSE.md).
+The fork uses the [Nix][4] package manager, and the [direnv][5] shell
+extension.  Install them using the instructions on their project
+sites, and then do:
 
-For the style guide and other instructions, see [UniMath/README.md](UniMath/README.md).
-
-Discussing UniMath & Getting Help
----------------------------------
-
-- **Questions** about the UniMath library, compilation, and installation of UniMath, etc.,
-should be sent to the [UniMath mailing list](mailto:univalent-mathematics@googlegroups.com), which is archived in the 
-[Google Group](https://groups.google.com/forum/#!forum/univalent-mathematics).
-- **Bugs** should be reported in our [UniMath bug tracker on Github](https://github.com/UniMath/UniMath/issues).
-
-
-Citing UniMath
---------------
-
-To cite UniMath in your article, you can use the following bibtex item:
-```bibtex
-@Misc{UniMath,
-    author = {Voevodsky, Vladimir and Ahrens, Benedikt and Grayson, Daniel and others},
-    title = {{UniMath --- a computer-checked library of univalent mathematics}},
-    url = {https://github.com/UniMath/UniMath},
-    howpublished = {{available} at \url{https://github.com/UniMath/UniMath}}
- }
+``` shell
+git clone https://github.com/nyraghu/UniMath
+cd UniMath
+direnv allow
 ```
-Note that this requires ```\usepackage{url}``` or ```\usepackage{hyperref}```.
 
+The `direnv allow` step may take a while because it makes Nix download
+and install several required packages.  After its completion, the fork
+is ready to be built.
 
-The UniMath Coordinating Committee
-----------------------------
+## Building
 
-The UniMath project was started in 2014 by merging the repository
-[Foundations](https://github.com/UniMath/Foundations), by Vladimir Voevodsky
-(written in 2010), with two repositories based on it:
-[rezk_completion](https://github.com/benediktahrens/rezk_completion), by
-Benedikt Ahrens, and [Ktheory](https://github.com/DanGrayson/Ktheory), by
-Daniel Grayson.  Vladimir Voevodsky was a member of the team until his death in
-September, 2017.
+Building the fork means compiling the Coq files in it.  As the fork
+uses Nix and direnv, it can be built in any environment that is
+supported by these two tools.  This means bash, or one of a few other
+shells, running on a Unix-like operating system.
 
-The current members of the UniMath Coordinating Committee are:
+After setting up Nix and direnv as in the previous section, do:
 
-- Benedikt Ahrens
-- Daniel Grayson
+``` shell
+make
+```
 
+in the top directory of the project (the one containing the file
+`shell.nix`).  A successful exit of the `make` command indicates that
+the Coq files in the fork have been compiled properly.
 
-Acknowledgments
----------------
-
-The UniMath development team gratefully acknowledges the great work by
-the Coq development team in providing the [Coq proof assistant](https://coq.inria.fr/), as well
-as their support in keeping UniMath compatible with Coq.
+[1]: https://github.com/UniMath/UniMath
+[2]: https://en.wikipedia.org/wiki/Univalent_foundations
+[3]: https://coq.inria.fr/
+[4]: https://github.com/NixOS/nix
+[5]: https://github.com/direnv/direnv
