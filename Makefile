@@ -1,11 +1,5 @@
 # -*- makefile-gmake -*-
 UMAKEFILES += Makefile
-ifneq "$(INCLUDE)" "no"
-ifeq ($(shell test -f build/Makefile-configuration && echo yes),yes)
-UMAKEFILES += build/Makefile-configuration
-include build/Makefile-configuration
-endif
-endif
 ############################################
 # The packages, listed in order by dependency:
 PACKAGES += Foundations
@@ -28,11 +22,10 @@ PACKAGES += AlgebraicGeometry
 PACKAGES += Paradoxes
 PACKAGES += Induction
 ############################################
-# other user options; see also build/Makefile-configuration-template
-BUILD_COQ ?= yes
+BUILD_COQ ?= no
 BUILD_COQIDE ?= no
 DEBUG_COQ ?= no
-COQBIN ?=
+COQBIN ?= ${coq}/bin/
 MEMORY_LIMIT ?= 2500000
 LIMIT_MEMORY ?= no
 ############################################
@@ -215,7 +208,6 @@ latex-clean clean::; cd $(LATEXDIR) ; rm -f *.pdf *.tex *.log *.aux *.out *.blg 
 
 distclean:: clean
 distclean::          ; - $(MAKE) -C sub/coq distclean
-distclean::          ; rm -f build/Makefile-configuration
 distclean::          ; - $(MAKE) -C sub/lablgtk arch-clean
 
 #############################################################################
