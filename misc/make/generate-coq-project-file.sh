@@ -10,8 +10,7 @@ set -o errexit
 
 packages="$@"
 
-printf "INSTALLDEFAULTROOT = UniMath
--Q UniMath UniMath
+printf -- "-Q UniMath UniMath
 -arg -indices-matter
 -arg -noinit
 -arg -type-in-type

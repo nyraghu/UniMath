@@ -3,9 +3,6 @@
 /html
 /enhanced-html
 /build/Makefile-configuration
-/.coq_makefile_input
-/.coq_makefile_output
-/.coq_makefile_output.conf
 /.coqdeps.d
 /build/CoqMakefile.make
 /latex/*.log
@@ -26,4 +23,6 @@ _CoqProject
 *.vos
 *.vok
 *.v~
-/..coq_makefile_output.d
+/.CoqMakefile.d
+/CoqMakefile
+/CoqMakefile.conf
