@@ -31,7 +31,7 @@ HIDE := $(if $(VERBOSE),,@)
 
 .PHONY: all everything install lc lcp wc describe clean distclean doc html
 all: make-summary-files
-everything: TAGS all html install
+everything: all html install
 sanity-checks:  check-prescribed-ordering	\
 		check-listing-of-proof-files	\
 		check-travis			\
@@ -70,54 +70,6 @@ ENHANCEDDOCHEADER = misc/html/header.html
 LATEXDIR = latex
 COQDOCLATEXOPTIONS := -latex -utf8 --body-only
 
-DEFINERS :=
-DEFINERS := $(DEFINERS)Axiom\|
-DEFINERS := $(DEFINERS)Class\|
-DEFINERS := $(DEFINERS)Coercion\|
-DEFINERS := $(DEFINERS)CoFixpoint\|
-DEFINERS := $(DEFINERS)CoInductive\|
-DEFINERS := $(DEFINERS)Corollary\|
-DEFINERS := $(DEFINERS)Definition\|
-DEFINERS := $(DEFINERS)Example\|
-DEFINERS := $(DEFINERS)Fact\|
-DEFINERS := $(DEFINERS)Fixpoint\|
-DEFINERS := $(DEFINERS)Function\|
-DEFINERS := $(DEFINERS)Identity[[:space:]]+Coercion\|
-DEFINERS := $(DEFINERS)Inductive\|
-DEFINERS := $(DEFINERS)Instance\|
-DEFINERS := $(DEFINERS)Lemma\|
-DEFINERS := $(DEFINERS)Ltac\|
-DEFINERS := $(DEFINERS)Module[[:space:]]+Import\|
-DEFINERS := $(DEFINERS)Module\|
-DEFINERS := $(DEFINERS)Notation\|
-DEFINERS := $(DEFINERS)Proposition\|
-DEFINERS := $(DEFINERS)Record\|
-DEFINERS := $(DEFINERS)Remark\|
-DEFINERS := $(DEFINERS)Scheme[[:space:]]+Equality[[:space:]]+for\|
-DEFINERS := $(DEFINERS)Scheme[[:space:]]+Induction[[:space:]]+for\|
-DEFINERS := $(DEFINERS)Scheme\|
-DEFINERS := $(DEFINERS)Structure\|
-DEFINERS := $(DEFINERS)Theorem\|
-DEFINERS := $(DEFINERS)Universe
-
-MODIFIERS :=
-MODIFIERS := $(MODIFIERS)Canonical\|
-MODIFIERS := $(MODIFIERS)Monomorphic\|
-MODIFIERS := $(MODIFIERS)Global\|
-MODIFIERS := $(MODIFIERS)Local\|
-MODIFIERS := $(MODIFIERS)Private\|
-MODIFIERS := $(MODIFIERS)Program\|
-
-COQDEFS := --language=none																			\
-	-r '/^[[:space:]]*\(\($(MODIFIERS)\)[[:space:]]+\)?\($(DEFINERS)\)[[:space:]]+\([[:alnum:][:nonascii:]'\''_]+\).?.?.?.?/\4/'						\
-	-r "/^[[:space:]]*Notation.* \"'\([[:alnum:][:nonascii:]'\''_]+\)'/\1/"													\
-	-r '/^[[:space:]]*Tactic[[:space:]]+Notation.*[[:space:]]"\([[:alnum:][:nonascii:]'\''_]+\)"[[:space:]]/\1/'								\
-	-r '/^[[:space:]]*Delimit[[:space:]]+Scope[[:space:]]+[[:alnum:][:nonascii:]'\''_]+[[:space:]]+with[[:space:]]+\([[:alnum:][:nonascii:]'\''_]+\)[[:space:]]*\./\1/'
-
-$(foreach P,$(PACKAGES),$(eval TAGS-$P: Makefile $(filter UniMath/$P/%,$(VFILES)); etags $(COQDEFS) -o $$@ $$^))
-TAGS : Makefile $(PACKAGE_FILES) $(VFILES)
-	$(SHOW)ETAGS
-	$(HIDE)etags $(COQDEFS) $(VFILES)
 FILES_FILTER := grep -vE '^[[:space:]]*(\#.*)?$$'
 FILES_FILTER_2 := grep -vE '^[[:space:]]*(\#.*)?$$$$'
 $(foreach P,$(PACKAGES),												\
