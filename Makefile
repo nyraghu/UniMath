@@ -62,8 +62,6 @@ endif
 ENHANCEDDOCTARGET = enhanced-html
 ENHANCEDDOCSOURCE = ${coqdoc_overlay}/share/javascript/coqdoc-overlay
 ENHANCEDDOCHEADER = misc/html/header.html
-LATEXDIR = latex
-COQDOCLATEXOPTIONS := -latex -utf8 --body-only
 
 FILES_FILTER := grep -vE '^[[:space:]]*(\#.*)?$$'
 FILES_FILTER_2 := grep -vE '^[[:space:]]*(\#.*)?$$$$'
@@ -124,7 +122,6 @@ clean::
 	find UniMath \( -name .\*.aux -o -name \*.glob -o -name \*.d -o -name \*.vo \) -delete
 	find UniMath -type d -empty -delete
 clean::; rm -rf $(ENHANCEDDOCTARGET)
-latex-clean clean::; cd $(LATEXDIR) ; rm -f *.pdf *.tex *.log *.aux *.out *.blg *.bbl
 
 distclean:: clean
 
@@ -141,16 +138,7 @@ doc: $(GLOBFILES) $(VFILES)
 	    $(VFILES)
 	sed -i'.bk' -f $(ENHANCEDDOCSOURCE)/proofs-toggle.sed $(ENHANCEDDOCTARGET)/*html
 
-world: all html doc latex-doc
-
-latex-doc: $(LATEXDIR)/doc.pdf
-
-$(LATEXDIR)/doc.pdf : $(LATEXDIR)/helper.tex $(LATEXDIR)/references.bib $(LATEXDIR)/latex-preamble.txt $(LATEXDIR)/helper.tex $(LATEXDIR)/latex-epilogue.txt
-	cd $(LATEXDIR) && cat latex-preamble.txt helper.tex latex-epilogue.txt > doc.tex
-	cd $(LATEXDIR) && latexmk -pdf -interaction=nonstopmode doc
-
-$(LATEXDIR)/coqdoc.sty $(LATEXDIR)/helper.tex : $(VFILES:.v=.glob) $(VFILES)
-	$(COQDOC) $(COQ_PATH) $(COQDOC_OPTIONS) $(COQDOCLATEXOPTIONS) $(VFILES) -o $@
+world: all html doc
 
 # here we assume the shell is bash, which it usually is nowadays, so we can get associative arrays:
 SHELL = bash
