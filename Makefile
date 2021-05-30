@@ -23,8 +23,6 @@ PACKAGES = $(shell ${PACKAGES_SED_COMMAND})
 ### ==================================================================
 
 COQBIN ?= ${coq}/bin/
-MEMORY_LIMIT ?= 2500000
-LIMIT_MEMORY ?= no
 
 ############################################
 SHOW := $(if $(VERBOSE),@true "",@echo "")
@@ -55,14 +53,8 @@ VFILES := $(COQMF_VFILES)
 VOFILES := $(VFILES:.v=.vo)
 endif
 
-ifeq ($(LIMIT_MEMORY),yes)
-EFFECTIVE_MEMORY_LIMIT = $(MEMORY_LIMIT)
-else
-EFFECTIVE_MEMORY_LIMIT = unlimited
-endif
-
 all html install uninstall $(VOFILES): build/CoqMakefile.make
-	ulimit -v $(EFFECTIVE_MEMORY_LIMIT) ; $(MAKE) -f build/CoqMakefile.make $@
+	$(MAKE) -f build/CoqMakefile.make $@
 clean:: build/CoqMakefile.make; $(MAKE) -f build/CoqMakefile.make $@
 distclean:: build/CoqMakefile.make; $(MAKE) -f build/CoqMakefile.make cleanall archclean
 
@@ -130,12 +122,11 @@ FILES_FILTER := grep -vE '^[[:space:]]*(\#.*)?$$'
 FILES_FILTER_2 := grep -vE '^[[:space:]]*(\#.*)?$$$$'
 $(foreach P,$(PACKAGES),												\
 	$(eval $P: make-summary-files build/CoqMakefile.make;								\
-		+ ulimit -v $(EFFECTIVE_MEMORY_LIMIT) ;									\
 		  $(MAKE) -f build/CoqMakefile.make									\
 			$(shell <UniMath/$P/.package/files $(FILES_FILTER) |sed "s=^\(.*\).v=UniMath/$P/\1.vo=" )	\
 			UniMath/$P/All.vo))
 
-$(foreach v,$(VFILES), $(eval $v.vo:; ulimit -v $(EFFECTIVE_MEMORY_LIMIT) ; $(MAKE) -f build/CoqMakefile.make $v.vo))
+$(foreach v,$(VFILES), $(eval $v.vo:; $(MAKE) -f build/CoqMakefile.make $v.vo))
 
 install:all
 coqwc:; coqwc $(VFILES)
