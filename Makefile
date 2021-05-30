@@ -18,38 +18,27 @@ endef
 ## The list of packages in order of dependency.
 PACKAGES = $(shell ${PACKAGES_SED_COMMAND})
 
-BUILD_COQ ?= no
-BUILD_COQIDE ?= no
-DEBUG_COQ ?= no
+### ==================================================================
+### Other things
+### ==================================================================
+
 COQBIN ?= ${coq}/bin/
 MEMORY_LIMIT ?= 2500000
 LIMIT_MEMORY ?= no
+
 ############################################
 SHOW := $(if $(VERBOSE),@true "",@echo "")
 HIDE := $(if $(VERBOSE),,@)
 ############################################
 
-.PHONY: all everything install lc lcp wc describe clean distclean build-coq doc build-coqide html
+.PHONY: all everything install lc lcp wc describe clean distclean doc html
 all: make-summary-files
 everything: TAGS all html install
 sanity-checks:  check-prescribed-ordering	\
 		check-listing-of-proof-files	\
 		check-travis			\
-		check-for-change-to-Foundations	\
-		check-for-submodule-changes
+		check-for-change-to-Foundations
 other-checks:   check-max-line-length
-
-COQIDE_OPTION := no
-
-ifeq "$(BUILD_COQ)" "yes"
-COQBIN=sub/coq/bin/
-all: build-coq
-build-coq: sub/coq/bin/coqc
-ifeq "$(BUILD_COQIDE)" "yes"
-all: build-coqide
-COQIDE_OPTION := opt
-endif
-endif
 
 COQ_PATH := -Q UniMath UniMath
 
@@ -64,10 +53,6 @@ ifneq "$(INCLUDE)" "no"
 include .coq_makefile_output.conf
 VFILES := $(COQMF_VFILES)
 VOFILES := $(VFILES:.v=.vo)
-endif
-
-ifeq ($(BUILD_COQ),yes)
-$(VOFILES) : $(COQBIN)coqc
 endif
 
 ifeq ($(LIMIT_MEMORY),yes)
@@ -204,40 +189,10 @@ clean::; rm -rf $(ENHANCEDDOCTARGET)
 latex-clean clean::; cd $(LATEXDIR) ; rm -f *.pdf *.tex *.log *.aux *.out *.blg *.bbl
 
 distclean:: clean
-distclean::          ; - $(MAKE) -C sub/coq distclean
-distclean::          ; - $(MAKE) -C sub/lablgtk arch-clean
-
-#############################################################################
-# building coq:
-export PATH:=$(shell pwd)/sub/coq/bin:$(PATH)
-CONFIGURE_OPTIONS := -coqide "$(COQIDE_OPTION)" -with-doc no -local -no-custom
-BUILD_TARGETS := coqbinaries tools states ltac
-ifeq ($(DEBUG_COQ),yes)
-CONFIGURE_OPTIONS += -annot
-BUILD_TARGETS += byte
-BUILD_OPTIONS += VERBOSE=true
-BUILD_OPTIONS += READABLE_ML4=yes
-endif
-ifeq ($(BUILD_COQIDE),yes)
-BUILD_TARGETS += coqide-files bin/coqide
-endif
-sub/coq/configure.ml:
-	git submodule update --init sub/coq
-sub/coq/config/coq_config.ml: sub/coq/configure.ml
-	@echo --- making $@ because of $?
-	cd sub/coq && ./configure $(CONFIGURE_OPTIONS)
-sub/coq/bin/coq_makefile sub/coq/bin/coqc: sub/coq/config/coq_config.ml
-.PHONY: rebuild-coq
-rebuild-coq sub/coq/bin/coq_makefile sub/coq/bin/coqc:
-	$(MAKE) -w -C sub/coq $(BUILD_OPTIONS) $(BUILD_TARGETS)
-ifeq ($(DEBUG_COQ),yes)
-	$(MAKE) -w -C sub/coq tags
-endif
-#############################################################################
 
 git-describe:
 	git describe --dirty --long --always --abbrev=40
-	git submodule foreach git describe --dirty --long --always --abbrev=40 --tags
+
 doc: $(GLOBFILES) $(VFILES)
 	mkdir -p $(ENHANCEDDOCTARGET)
 	cp $(ENHANCEDDOCSOURCE)/proofs-toggle.js $(ENHANCEDDOCTARGET)/proofs-toggle.js
@@ -247,31 +202,6 @@ doc: $(GLOBFILES) $(VFILES)
 	    --with-header $(ENHANCEDDOCHEADER)					\
 	    $(VFILES)
 	sed -i'.bk' -f $(ENHANCEDDOCSOURCE)/proofs-toggle.sed $(ENHANCEDDOCTARGET)/*html
-
-# Jason Gross' coq-tools bug isolator:
-# The isolated bug will appear in this file, in the UniMath directory:
-ISOLATED_BUG_FILE := isolated_bug.v
-# To use it, run something like this command in an interactive shell:
-#     make isolate-bug BUGGY_FILE=Foundations/Basics/PartB.v
-sub/coq-tools/find-bug.py:
-	git submodule update --init sub/coq-tools
-help-find-bug:
-	sub/coq-tools/find-bug.py --help
-isolate-bug: sub/coq-tools/find-bug.py
-	cd UniMath &&												\
-	rm -f $(ISOLATED_BUG_FILE) &&										\
-	../sub/coq-tools/find-bug.py --coqbin ../sub/coq/bin -R . UniMath					\
-		--arg " -indices-matter"									\
-		--arg " -type-in-type"										\
-		--arg " -noinit"										\
-		--arg " -indices-matter"									\
-		--arg " -type-in-type"										\
-		--arg " -w"											\
-		--arg " -notation-overridden,-local-declaration,+uniform-inheritance,-deprecated-option"	\
-		$(BUGGY_FILE) $(ISOLATED_BUG_FILE)
-	@echo "==="
-	@echo "=== the isolated bug has been deposited in the file UniMath/$(ISOLATED_BUG_FILE)"
-	@echo "==="
 
 world: all html doc latex-doc
 
@@ -424,13 +354,6 @@ check-for-change-to-Foundations:
 	git fetch origin
 	test -z "`git diff --stat origin/master -- UniMath/Foundations`"
 
-# Here we check for changes to sub/coq, which normally does not change.
-# One step of the travis job will fail, if a change is made, see .travis.yml
-check-for-submodule-changes:
-	@echo "--- checking for submodule changes ---"
-	git fetch origin
-	test -z "`git diff origin/master sub`"
-
 # Here we create a table of contents file, in markdown format, for browsing on github
 # When the file UniMath/CONTENTS.md changes, the new version should be committed to github.
 all: UniMath/CONTENTS.md
@@ -484,10 +407,6 @@ UniMath/All.v: Makefile
 # targets best used with INCLUDE=no
 git-clean:
 	git clean -Xdfq
-	git submodule foreach git clean -xdfq
-git-deinit:
-	git submodule foreach git clean -xdfq
-	git submodule deinit -f sub/*
 #################################
 
 ### End of file
