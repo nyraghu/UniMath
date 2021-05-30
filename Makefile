@@ -1,24 +1,23 @@
-# The packages, listed in order by dependency:
-PACKAGES += Foundations
-PACKAGES += MoreFoundations
-PACKAGES += Combinatorics
-PACKAGES += Algebra
-PACKAGES += NumberSystems
-PACKAGES += SyntheticHomotopyTheory
-PACKAGES += PAdics
-PACKAGES += CategoryTheory
-PACKAGES += Bicategories
-PACKAGES += Ktheory
-PACKAGES += Topology
-PACKAGES += RealNumbers
-PACKAGES += Tactics
-PACKAGES += SubstitutionSystems
-PACKAGES += Folds
-PACKAGES += HomologicalAlgebra
-PACKAGES += AlgebraicGeometry
-PACKAGES += Paradoxes
-PACKAGES += Induction
-############################################
+### Makefile for the project
+
+### ==================================================================
+### Packages
+### ==================================================================
+
+## File containing the list of packages in order of dependency.
+PACKAGES_FILE = misc/make/packages
+
+## Command to remove comments and blank lines from the packages file.
+define PACKAGES_SED_COMMAND =
+sed \
+-e 's@[[:space:]]*#.*@@' \
+-e '/^[[:space:]]*$$/d' \
+${PACKAGES_FILE}
+endef
+
+## The list of packages in order of dependency.
+PACKAGES = $(shell ${PACKAGES_SED_COMMAND})
+
 BUILD_COQ ?= no
 BUILD_COQIDE ?= no
 DEBUG_COQ ?= no
@@ -490,3 +489,5 @@ git-deinit:
 	git submodule foreach git clean -xdfq
 	git submodule deinit -f sub/*
 #################################
+
+### End of file

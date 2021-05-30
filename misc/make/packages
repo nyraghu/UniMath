@@ -1,0 +1,48 @@
+### Packages in order of dependency
+
+## This file is used by `make(1)' to build the project.  In any line
+## of this file, text starting with the character `#' and extending
+## until the end of that line is considered a comment.  The `make'
+## command, when it uses this file, will elide from it comments and
+## blank lines, i.e., lines consisting of whitespace alone.
+
+## Here is an explanation of the contents of this file.  For the
+## purposes of this description, I will use the term "Coq root" for
+## the subdirectory `UniMath' of the top directory of the project.
+## All the Coq files in the project are under the Coq root.
+
+## A "package" is a subdirectory of the Coq root.  The Coq files in a
+## package are related to a particular topic in mathematics such as
+## algebra or category theory.  This topic is reflected in the name of
+## the package directory.
+
+## Below are the names of all the packages in the project.  They are
+## listed in order of dependency.  This means that a package may
+## depend on some of the packages that are before it in the list, but
+## not on any package that is after it in the list.
+
+Foundations
+MoreFoundations
+Combinatorics
+Algebra
+NumberSystems
+SyntheticHomotopyTheory
+PAdics
+CategoryTheory
+Bicategories
+Ktheory
+Topology
+RealNumbers
+Tactics
+SubstitutionSystems
+Folds
+HomologicalAlgebra
+AlgebraicGeometry
+Paradoxes
+Induction
+
+### End of file
+
+## Local Variables:
+## comment-start: "#"
+## End:
