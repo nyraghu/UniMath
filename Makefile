@@ -32,11 +32,6 @@ HIDE := $(if $(VERBOSE),,@)
 .PHONY: all everything install lc lcp wc describe clean distclean doc html
 all: make-summary-files
 everything: all html install
-sanity-checks:  check-prescribed-ordering	\
-		check-listing-of-proof-files	\
-		check-travis			\
-		check-for-change-to-Foundations
-other-checks:   check-max-line-length
 
 COQ_PATH := -Q UniMath UniMath
 
@@ -157,145 +152,8 @@ $(LATEXDIR)/doc.pdf : $(LATEXDIR)/helper.tex $(LATEXDIR)/references.bib $(LATEXD
 $(LATEXDIR)/coqdoc.sty $(LATEXDIR)/helper.tex : $(VFILES:.v=.glob) $(VFILES)
 	$(COQDOC) $(COQ_PATH) $(COQDOC_OPTIONS) $(COQDOCLATEXOPTIONS) $(VFILES) -o $@
 
-.PHONY: check-max-line-length
-check-max-line-length:
-	LC_ALL="en_US.UTF-8" gwc -L $(VFILES) | grep -vw total | awk '{ if ($$1 > 100) { printf "%6d  %s\n", $$1, $$2 }}' | sort -r | grep .
-show-long-lines:
-	LC_ALL="en_US.UTF-8" grep -nE '.{101}' $(VFILES)
-
 # here we assume the shell is bash, which it usually is nowadays, so we can get associative arrays:
 SHELL = bash
-check-prescribed-ordering: .check-prescribed-ordering.okay
-clean::; rm -f .check-prescribed-ordering.okay
-
-# We arrange for the *.d files to be made, because we need to read them to enforce the prescribed ordering, by listing them as dependencies here.
-# Up to coq version 8.7, each *.v file had a corresponding *.v.d file.
-# After that, there is just one *.d file, its name is .coqdeps.d, and it sits in this top-level directory.
-# So we have to distinguish the versions somehow; here we do that.
-# We expect the file build/CoqMakefile.make to exist now, because we have an include command above for the file .coq_makefile_output.conf,
-# and the same rule that make it makes build/CoqMakefile.make.
-VDFILE := ..coq_makefile_output.d
-clean::; rm -f $(VDFILE)
-ifeq ($(shell grep -q ^VDFILE build/CoqMakefile.make && echo yes),yes)
-# Coq >= 8.8
-DEPFILES := $(VDFILE)
-.check-prescribed-ordering.okay: Makefile $(DEPFILES) $(PACKAGE_FILES)
-	@echo "--- checking the ordering prescribed by the files UniMath/*/.packages/files ---"
-	@set -e ;														    \
-	if declare -A seqnum 2>/dev/null ;											    \
-	then n=0 ;														    \
-	     for i in $(VOFILES) ;												    \
-	     do n=$$(( $$n + 1 )) ;												    \
-		seqnum[$$i]=$$n ;												    \
-	     done ;														    \
-	     for i in $(VFILES:.v=.vo);												    \
-	     do grep "^$$i" $(DEPFILES) ;											    \
-	     done														    \
-	     | sed -E -e 's/[^ ]*\.(glob|v\.beautified|v)([ :]|$$)/\2/g' -e 's/ *: */ /'					    \
-	     | while read line ;												    \
-	       do for i in $$line ; do echo $$i ; done										    \
-		  | ( read target ;												    \
-		      [ "$${seqnum[$$target]}" ] || (echo unknown target: $$target; false) >&2 ;				    \
-		      while read prereq ;											    \
-		      do [ "$${seqnum[$$prereq]}" ] || (echo "unknown prereq of $$target : $$prereq" ; false) >&2 ;		    \
-			 echo "$$(($${seqnum[$$target]} > $${seqnum[$$prereq]})) error: *** $$target should not require $$prereq" ; \
-		      done ) ;													    \
-	       done | grep ^0 | sed 's/^0 //' |											    \
-	       ( haderror= ;													    \
-		 while read line ;												    \
-		 do if [ ! "$$haderror" ] ; then haderror=1 ; fi ;								    \
-		    echo "$$line" ;												    \
-		 done ;														    \
-		 [ ! "$$haderror" ] ) ;												    \
-	else echo "make: *** skipping checking the linear ordering of packages, because 'bash' is too old" ;			    \
-	fi
-	touch $@
-else
-DEPFILES := $(VFILES:.v=.v.d)
-.check-prescribed-ordering.okay: Makefile $(DEPFILES) $(PACKAGE_FILES)
-	@echo "--- checking the ordering prescribed by the files UniMath/*/.packages/files ---"
-	@set -e ;															\
-	if declare -A seqnum 2>/dev/null ;												\
-	then n=0 ;															\
-	     for i in $(VOFILES) ;													\
-	     do n=$$(( $$n + 1 )) ;													\
-		seqnum[$$i]=$$n ;													\
-	     done ;															\
-	     for i in $(DEPFILES);													\
-	     do head -1 $$i ;														\
-	     done															\
-	     | sed -E -e 's/[^ ]*\.(glob|v\.beautified|v)([ :]|$$)/\2/g' -e 's/ *: */ /'						\
-	     | while read line ;													\
-	       do for i in $$line ; do echo $$i ; done											\
-		  | ( read target ;													\
-		      [ "$${seqnum[$$target]}" ] || (echo unknown target: $$target; false) >&2 ;					\
-		      while read prereq ;												\
-		      do [ "$${seqnum[$$prereq]}" ] || (echo "unknown prereq of $$target : $$prereq" ; false) >&2 ;			\
-			 echo "$$(($${seqnum[$$target]} > $${seqnum[$$prereq]})) error: *** $$target should not require $$prereq" ;	\
-		      done ) ;														\
-	       done | grep ^0 | sed 's/^0 //' |												\
-	       ( haderror= ;														\
-		 while read line ;													\
-		 do if [ ! "$$haderror" ] ; then haderror=1 ; fi ;									\
-		    echo "$$line" ;													\
-		 done ;															\
-		 [ ! "$$haderror" ] ) ;													\
-	else echo "make: *** skipping checking the linear ordering of packages, because 'bash' is too old" ;				\
-	fi
-	touch $@
-endif
-
-# DEPFILES is defined above
-$(DEPFILES): make-summary-files | build/CoqMakefile.make
-	$(MAKE) -f build/CoqMakefile.make $@
-
-# here we ensure that the travis script checks every package
-check-travis:.check-travis.okay
-clean::; rm -f .check-travis.okay
-.check-travis.okay: Makefile .travis.yml
-	@echo --- checking travis script ---
-	@set -e ;													\
-	for p in $(PACKAGES) ;												\
-	do grep -q "PACKAGES=.*$$p" .travis.yml || ( echo "package $$p not checked by .travis.yml" >&2 ; exit 1 ) ;	\
-	done
-	touch "$@"
-
-
-# here we ensure that every *.v file F in each package P is listed in the corresponding file UniMath/P/.package/files
-# except for those listed in $GRANDFATHER_UNLISTED (currently none)
-GRANDFATHER_UNLISTED =
-check-listing-of-proof-files:
-	@ echo --- checking every proof file is listed in one of the packages ---
-	@ if declare -A islisted 2>/dev/null ;										\
-	  then for i in $(VFILES) $(GRANDFATHER_UNLISTED) ;								\
-	       do islisted[$$i]=yes ;											\
-	       done ;													\
-	       m=0 ;													\
-	       for P in $(PACKAGES) ;											\
-	       do find UniMath/$$P -name '*.v' |									\
-		       (												\
-		       n=0 ;												\
-		       while read F ;											\
-		       do if [ "$${islisted[$$F]}" != yes ] ;								\
-			  then echo "error: *** file $$F not listed in appropriate file UniMath/*/.package/files" >&2 ;	\
-			       n=$$(( $$n + 1 )) ;									\
-			  fi ;												\
-		       done ; exit $$n ) ;										\
-		  m=$$(( $$m + $$? )) ;											\
-	       done ;													\
-	       if [ $$m != 0 ] ;											\
-	       then echo "error: *** $$m unlisted proof files encountered" >&2 ;					\
-		    exit 1 ;												\
-	       fi ;													\
-	  else echo "make: *** skipping checking the listing of proof files, because 'bash' is too old" ;		\
-	  fi
-
-# Here we check for changes to UniMath/Foundations, which normally does not change.
-# One step of the travis job will fail, if a change is made, see .travis.yml
-check-for-change-to-Foundations:
-	@echo --- checking for changes to the Foundations package ---
-	git fetch origin
-	test -z "`git diff --stat origin/master -- UniMath/Foundations`"
 
 # Here we create a table of contents file, in markdown format, for browsing on github
 # When the file UniMath/CONTENTS.md changes, the new version should be committed to github.
@@ -318,9 +176,6 @@ UniMath/CONTENTS.md: Makefile UniMath/*/.package/files
 	      echo "   - [All.v]($$P/All.v)" ;											\
 	   done
 
-# Here we call a shell script checking the Coq files for adherence to our style
-check-style :
-	util/checkstyle $(VFILES)
 
 # Here we create the files UniMath/*/All.v, with * running over the names of the packages.  Each one of these files
 # will "Require Export" all of the files in its package.
