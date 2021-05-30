@@ -29,9 +29,8 @@ SHOW := $(if $(VERBOSE),@true "",@echo "")
 HIDE := $(if $(VERBOSE),,@)
 ############################################
 
-.PHONY: all everything install lc lcp wc describe clean distclean doc html
+.PHONY: all install clean distclean doc html
 all: make-summary-files
-everything: all html install
 
 COQ_PATH := -Q UniMath UniMath
 
@@ -74,15 +73,6 @@ $(foreach P,$(PACKAGES),												\
 $(foreach v,$(VFILES), $(eval $v.vo:; $(MAKE) -f build/CoqMakefile.make $v.vo))
 
 install:all
-coqwc:; coqwc $(VFILES)
-lc:; wc -l $(VFILES)
-lcp:; for i in $(PACKAGES) ; do echo ; echo ==== $$i ==== ; for f in $(VFILES) ; do echo "$$f" ; done | grep "UniMath/$$i" | xargs wc -l ; done
-wc:; wc -w $(VFILES)
-admitted:
-	grep --color=auto Admitted $(VFILES)
-axiom:
-	grep --color=auto "Axiom " $(VFILES)
-describe:; git describe --dirty --long --always --abbrev=40 --all
 .coq_makefile_input: $(PACKAGE_FILES) Makefile
 	@echo --- making $@ ; ( \
 	echo '# -*- makefile-gmake -*-' ;\
@@ -125,9 +115,6 @@ clean::; rm -rf $(ENHANCEDDOCTARGET)
 
 distclean:: clean
 
-git-describe:
-	git describe --dirty --long --always --abbrev=40
-
 doc: $(GLOBFILES) $(VFILES)
 	mkdir -p $(ENHANCEDDOCTARGET)
 	cp $(ENHANCEDDOCSOURCE)/proofs-toggle.js $(ENHANCEDDOCTARGET)/proofs-toggle.js
@@ -137,8 +124,6 @@ doc: $(GLOBFILES) $(VFILES)
 	    --with-header $(ENHANCEDDOCHEADER)					\
 	    $(VFILES)
 	sed -i'.bk' -f $(ENHANCEDDOCSOURCE)/proofs-toggle.sed $(ENHANCEDDOCTARGET)/*html
-
-world: all html doc
 
 # here we assume the shell is bash, which it usually is nowadays, so we can get associative arrays:
 SHELL = bash
