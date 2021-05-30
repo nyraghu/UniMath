@@ -128,28 +128,6 @@ doc: $(GLOBFILES) $(VFILES)
 # here we assume the shell is bash, which it usually is nowadays, so we can get associative arrays:
 SHELL = bash
 
-# Here we create a table of contents file, in markdown format, for browsing on github
-# When the file UniMath/CONTENTS.md changes, the new version should be committed to github.
-all: UniMath/CONTENTS.md
-UniMath/CONTENTS.md: Makefile UniMath/*/.package/files
-	$(SHOW)'--- making $@'
-	$(HIDE) exec >$@ ;													\
-	   echo "# Contents of the UniMath library" ;										\
-	   echo "The packages and files are listed here in logical order: each file depends only on files occurring earlier." ;	\
-	   for P in $(PACKAGES) ;												\
-	   do if [ -f UniMath/$$P/README.md ] ;											\
-	      then echo "## Package [$$P]($$P/README.md)" ;									\
-	      elif [ -f UniMath/$$P/README ] ;											\
-	      then echo "## Package [$$P]($$P/README)" ;									\
-	      else echo "## Package $$P" ;											\
-	      fi ;														\
-	      for F in `<UniMath/$$P/.package/files $(FILES_FILTER)` ;								\
-	      do echo "   - [$$F]($$P/$$F)" ;											\
-	      done ;														\
-	      echo "   - [All.v]($$P/All.v)" ;											\
-	   done
-
-
 # Here we create the files UniMath/*/All.v, with * running over the names of the packages.  Each one of these files
 # will "Require Export" all of the files in its package.
 define make-summary-file
