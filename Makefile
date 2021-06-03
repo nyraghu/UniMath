@@ -22,8 +22,6 @@ PACKAGES = $(shell ${PACKAGES_SED_COMMAND})
 ### Other things
 ### ==================================================================
 
-COQBIN ?= ${coq}/bin/
-
 ############################################
 SHOW := $(if $(VERBOSE),@true "",@echo "")
 HIDE := $(if $(VERBOSE),,@)
@@ -85,13 +83,8 @@ COQ_PROJECT_FILE = _CoqProject
 ${COQ_PROJECT_FILE}: $(PACKAGE_FILES) Makefile
 	${GENERATE_COQ_PROJECT_FILE}
 
-ifdef COQBIN
-${COQ_MAKEFILE} ${COQ_MAKEFILE}.conf: $(COQBIN)coq_makefile
-else
-${COQ_MAKEFILE} ${COQ_MAKEFILE}.conf: $(shell command -v coq_makefile)
-endif
 ${COQ_MAKEFILE} ${COQ_MAKEFILE}.conf: ${COQ_PROJECT_FILE}
-	$(COQBIN)coq_makefile -f ${COQ_PROJECT_FILE} -o ${COQ_MAKEFILE}
+	coq_makefile -f ${COQ_PROJECT_FILE} -o ${COQ_MAKEFILE}
 
 # "clean::" occurs also in ${COQ_MAKEFILE}, hence both colons
 clean::
