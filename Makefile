@@ -113,11 +113,7 @@ SHELL = bash
 define make-summary-file
 make-summary-files: UniMath/$1/All.v
 UniMath/$1/All.v: UniMath/$1/.package/files Makefile
-	$(SHOW)'--- making $$@'
-	$(HIDE)																				\
-	  exec > $$@ ;																			\
-	  echo "(* This file has been auto-generated, do not edit it. *)" ;												\
-	  <UniMath/$1/.package/files $(FILES_FILTER_2) | grep -v '^\(.*/\)\?Tests\?.v$$$$' |sed -e "s=^=Require Export UniMath.$1.=" -e "s=/=.=g" -e s/\.v$$$$/./
+	${SHELL} misc/make/generate-package-summary-file.sh $1 > $$@
 endef
 $(foreach P, $(PACKAGES), $(eval $(call make-summary-file,$P)))
 
