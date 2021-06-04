@@ -26,3 +26,4 @@ _CoqProject
 /.CoqMakefile.d
 /CoqMakefile
 /CoqMakefile.conf
+/.Makefile.d

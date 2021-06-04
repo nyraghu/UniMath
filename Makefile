@@ -51,6 +51,12 @@ all html install uninstall $(VOFILES): ${COQ_MAKEFILE}
 	$(MAKE) -f ${COQ_MAKEFILE} $@
 clean:: ${COQ_MAKEFILE}; $(MAKE) -f ${COQ_MAKEFILE} $@
 distclean:: ${COQ_MAKEFILE}; $(MAKE) -f ${COQ_MAKEFILE} cleanall archclean
+	rm -f .Makefile.d
+
+.Makefile.d:
+	${SHELL} misc/make/generate-dependency-makefile.sh ${PACKAGES} > $@
+
+include .Makefile.d
 
 WARNING_FLAGS := -notation-overridden
 OTHERFLAGS += $(MOREFLAGS)
@@ -61,14 +67,6 @@ endif
 ENHANCEDDOCTARGET = enhanced-html
 ENHANCEDDOCSOURCE = ${coqdoc_overlay}/share/javascript/coqdoc-overlay
 ENHANCEDDOCHEADER = misc/html/header.html
-
-FILES_FILTER := grep -vE '^[[:space:]]*(\#.*)?$$'
-FILES_FILTER_2 := grep -vE '^[[:space:]]*(\#.*)?$$$$'
-$(foreach P,$(PACKAGES),												\
-	$(eval $P: make-summary-files ${COQ_MAKEFILE};								\
-		  $(MAKE) -f ${COQ_MAKEFILE}									\
-			$(shell <UniMath/$P/.package/files $(FILES_FILTER) |sed "s=^\(.*\).v=UniMath/$P/\1.vo=" )	\
-			UniMath/$P/All.vo))
 
 $(foreach v,$(VFILES), $(eval $v.vo:; $(MAKE) -f ${COQ_MAKEFILE} $v.vo))
 
