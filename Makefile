@@ -118,7 +118,7 @@ $(foreach P, $(PACKAGES), $(eval $(call make-summary-file,$P)))
 # Here we create the file UniMath/All.v.  It will "Require Export" all of the All.v files for the various packages.
 make-summary-files: UniMath/All.v
 UniMath/All.v: Makefile
-	${SHELL} misc/make/generate-combined-summary-file.sh ${PACKAGES}
+	${SHELL} misc/make/generate-combined-summary-file.sh ${PACKAGES} > $@
 
 #################################
 # targets best used with INCLUDE=no
