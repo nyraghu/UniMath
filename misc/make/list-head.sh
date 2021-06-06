@@ -1,6 +1,6 @@
 ### Find the initial interval bounded by a subset of a chain
 
-## sh chain subset
+## sh list-head.sh chain subset
 ##
 ## Return the initial interval of `chain' bounded by `subset'.
 ##
