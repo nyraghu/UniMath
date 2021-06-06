@@ -16,7 +16,9 @@ if test $# -eq 0; then
 fi
 packages="$@"
 
-printf -- "-Q UniMath UniMath
+printf "# This file has been auto-generated, do not edit it.\n"
+
+printf -- "\n-Q UniMath UniMath
 -arg -indices-matter
 -arg -noinit
 -arg -type-in-type
@@ -25,13 +27,14 @@ printf -- "-Q UniMath UniMath
 
 for package in ${packages}; do
     directory="UniMath/${package}"
+    printf "\n"
     sed -e 's@#.*@@' \
         -e '/^[[:space:]]*$/d' \
         -e "s@^[[:space:]]*@${directory}/@" \
         "${directory}/.package/files"
-    printf "${directory}/All.v\n"
+    printf "\n${directory}/All.v\n"
 done
 
-printf "UniMath/All.v\n"
+printf "\nUniMath/All.v\n"
 
 ### End of file

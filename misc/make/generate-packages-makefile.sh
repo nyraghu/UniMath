@@ -2,10 +2,10 @@
 
 ## sh generate-dependency-makefile.sh packages
 ##
-## Print to standard output the dependency Makefile for `packages'.
-## It will have a target for every package in `packages'.  The rule
-## for that target ensures that all the files in the package are
-## compiled.
+## Print to standard output the packages Makefile for `packages'.  It
+## will have a target for every package in `packages', and for every
+## compiled file in each of those packages.  The rule for a package
+## target ensures that all the files in the package are compiled.
 
 PATH=/bin:/usr/bin
 set -o errexit
@@ -17,6 +17,7 @@ if test $# -eq 0; then
     exit 1
 fi
 packages="$@"
+make='${MAKE} --file=${_COQ_MAKEFILE} --no-print-directory'
 
 printf "## This file has been auto-generated, do not edit it.\n"
 for package in ${packages}; do
@@ -29,8 +30,17 @@ for package in ${packages}; do
                    | tr '\n' ' ' \
                    | sed 's@[[:space:]]*$@@')"
     summary="${directory}/All.vo"
-    printf "\n${package}: make-summary-files \${COQ_MAKEFILE}\n"
-    printf "\t\${MAKE} -f \${COQ_MAKEFILE} ${vofiles} ${summary}\n"
+    vofiles="${vofiles} ${summary}"
+    printf "\n${package}: \${_COQ_MAKEFILE}\n"
+    printf "\t${make} ${vofiles}\n"
+    for file in ${vofiles}; do
+        target="$(printf "${file}" \
+                         | sed -e 's@^UniMath/@@' \
+                               -e 's@\.vo$@@' \
+                               -e 's@/@.@g')"
+        printf "\n${target}: \${_COQ_MAKEFILE}\n"
+        printf "\t${make} ${file}\n"
+    done
 done
 
 ### End of file
