@@ -15,7 +15,7 @@ if test $# -ne 1; then
 fi
 package="$1"
 
-printf "(* This file has been auto-generated, do not edit it. *)\n"
+printf "(* This file was automatically generated, do not edit it. *)\n"
 sed -e 's@#.*@@' \
     -e '/^[[:space:]]*$/d' \
     -e '/Test[s]*\.v$/d' \
@@ -23,5 +23,6 @@ sed -e 's@#.*@@' \
     -e 's@\.v$@.@' \
     -e "s@^[[:space:]]*@Require Export UniMath.${package}.@" \
     "UniMath/${package}/.package/files"
+printf "(* End of file *)\n"
 
 ### End of file

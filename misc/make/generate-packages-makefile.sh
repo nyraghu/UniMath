@@ -1,11 +1,12 @@
 ### Generate the dependency Makefile for the given packages
 
-## sh generate-dependency-makefile.sh packages
+## sh generate-packages-makefile.sh packages
 ##
 ## Print to standard output the packages Makefile for `packages'.  It
 ## will have a target for every package in `packages', and for every
-## compiled file in each of those packages.  The rule for a package
-## target ensures that all the files in the package are compiled.
+## module in each of those packages.  The rule for a package target
+## ensures that all the modules in the package are compiled.  The rule
+## for a module target ensures that the module will be compiled.
 
 PATH=/bin:/usr/bin
 set -o errexit
@@ -19,7 +20,7 @@ fi
 packages="$@"
 make='${MAKE} --file=${_COQ_MAKEFILE} --no-print-directory'
 
-printf "## This file has been auto-generated, do not edit it.\n"
+printf "# This file was automatically generated, do not edit it.\n"
 for package in ${packages}; do
     directory="UniMath/${package}"
     vofiles="$(sed -e 's@#.*@@' \
@@ -42,5 +43,6 @@ for package in ${packages}; do
         printf "\t${make} ${file}\n"
     done
 done
+printf "\n# End of file\n"
 
 ### End of file

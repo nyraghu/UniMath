@@ -16,7 +16,7 @@ if test $# -eq 0; then
 fi
 packages="$@"
 
-printf "# This file has been auto-generated, do not edit it.\n"
+printf "# This file was automatically generated, do not edit it.\n"
 
 printf -- "\n-Q UniMath UniMath
 -arg -indices-matter
@@ -36,5 +36,7 @@ for package in ${packages}; do
 done
 
 printf "\nUniMath/All.v\n"
+
+printf "\n# End of file\n"
 
 ### End of file
