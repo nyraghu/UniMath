@@ -10,6 +10,11 @@
 ##
 ## $ export PACKAGES="PAdics Algebra Topology"
 ##
+## The packages in the value of `PACKAGES' need not be in order of
+## dependency.  It is however an error if any of those packages is not
+## in the full set of packages, and the subsequent `make' commands
+## will then fail.
+##
 ## The packages of the project are listed in order of dependency in
 ## the file `misc/make/packages'.  If the environment variable
 ## `PACKAGES' is unset or has a blank value, `make' will assume that
