@@ -71,7 +71,7 @@ for element in ${subset}; do
     eval index=\${${element}_index}
     if test -z "${index}"; then
         printf "Error: element \"${element}\" of \"${subset}\" \
-is not in \"${chain}\"\n"
+is not in \"${chain}\"\n" >&2
         exit 2
     fi
     if test ${index} -gt ${maximum}; then
