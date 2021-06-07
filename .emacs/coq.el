@@ -18,4 +18,22 @@
                             "-noinit"
                             "-type-in-type"))
 
+(defvar-local coq:tags-table
+  (expand-file-name "TAGS" project:emacs-directory)
+  "The tags table for the project.")
+
+(defun coq:make-tags ()
+  "Rebuild the project tags table and visit it."
+  (interactive)
+  (let ((default-directory project:emacs-directory))
+    (let ((status (shell-command "make VERBOSE=1 tags")))
+      (when (zerop status)
+        (let ((tags-buffer (get-file-buffer coq:tags-table)))
+          (when tags-buffer
+            (with-current-buffer tags-buffer
+              (revert-buffer t t))))
+        (visit-tags-table coq:tags-table t)))))
+
+(coq:make-tags)
+
 ;;; End of file

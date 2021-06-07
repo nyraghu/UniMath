@@ -11,6 +11,7 @@
 /_CoqProject
 /_PackagesMakefile
 /html
+TAGS
 UniMath/*/All.v
 UniMath/All.v
 
